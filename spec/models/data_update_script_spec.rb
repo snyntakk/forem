@@ -43,17 +43,8 @@ RSpec.describe DataUpdateScript do
   describe ".scripts_to_run?" do
     before { stub_const "#{described_class}::DIRECTORY", test_directory }
 
-    it "returns true for a new set of files" do
-      expect(described_class.scripts_to_run?).to be(true)
-    end
-
     it "returns true if there is an enqueued script" do
       create(:data_update_script, status: :enqueued)
-      expect(described_class.scripts_to_run?).to be(true)
-    end
-
-    it "returns true if there are multiple files on disk" do
-      create(:data_update_script, status: :working)
       expect(described_class.scripts_to_run?).to be(true)
     end
 
