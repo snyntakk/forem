@@ -48,7 +48,7 @@ module Search
       end
 
       def self.serialize(results)
-        Search::ListingResultSerializer
+        Search::ListingSerializer
           .new(results, is_collection: true)
           .serializable_hash[:data]
           .pluck(:attributes)
