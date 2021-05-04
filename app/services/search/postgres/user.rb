@@ -63,7 +63,7 @@ module Search
       private_class_method :sort
 
       def self.serialize(users)
-        Search::PostgresUserSerializer
+        Search::SimpleUserSerializer
           .new(users, is_collection: true)
           .serializable_hash[:data]
           .pluck(:attributes)
