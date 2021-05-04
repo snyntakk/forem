@@ -23,7 +23,7 @@ module Search
         body_text: [comment.pg_search_highlight]
       }
     rescue PgSearch::PgSearchHighlightNotSelected
-      # This is needed because in Search::Postgres::Comment we only call the
+      # This is needed because in Search::Comment we only call the
       # search if a term is provided. This means if a user searches with a
       # blank term, we skip the line that executes .with_pg_search_highlight.
       # Skipping this AND trying to call .pg_search_highlight raises an error
