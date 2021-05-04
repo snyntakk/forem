@@ -66,7 +66,7 @@ module Search
       end
 
       def self.serialize(results)
-        Search::PostgresCommentSerializer
+        Search::CommentSerializer
           .new(results, is_collection: true)
           .serializable_hash[:data]
           .pluck(:attributes)
