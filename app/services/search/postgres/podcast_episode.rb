@@ -51,7 +51,7 @@ module Search
       private_class_method :sort
 
       def self.serialize(results)
-        Search::PostgresPodcastEpisodeSerializer
+        Search::PodcastEpisodeSerializer
           .new(results, is_collection: true)
           .serializable_hash[:data]
           .pluck(:attributes)
