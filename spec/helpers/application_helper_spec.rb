@@ -80,12 +80,11 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect(helper.release_adjusted_cache_key("cache-me")).to include("cache-me-fr-ca-abc123")
     end
 
-    it "includes Settings::General.admin_action_taken_at" do
+    it "includes SiteConfig.admin_action_taken_at" do
       Timecop.freeze do
-        allow(Settings::General).to receive(:admin_action_taken_at).and_return(5.minutes.ago)
+        allow(SiteConfig).to receive(:admin_action_taken_at).and_return(5.minutes.ago)
         allow(ApplicationConfig).to receive(:[]).with("RELEASE_FOOTPRINT").and_return("abc123")
-        expect(helper.release_adjusted_cache_key("cache-me"))
-          .to include(Settings::General.admin_action_taken_at.rfc3339)
+        expect(helper.release_adjusted_cache_key("cache-me")).to include(SiteConfig.admin_action_taken_at.rfc3339)
       end
     end
   end
@@ -119,7 +118,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     before do
       allow(ApplicationConfig).to receive(:[]).with("APP_PROTOCOL").and_return("https://")
       allow(ApplicationConfig).to receive(:[]).with("APP_DOMAIN").and_return("dev.to")
-      allow(Settings::General).to receive(:app_domain).and_return("dev.to")
+      allow(SiteConfig).to receive(:app_domain).and_return("dev.to")
     end
 
     it "creates the correct base app URL" do
@@ -161,7 +160,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     let(:contact_email) { "contact@dev.to" }
 
     before do
-      allow(Settings::General).to receive(:email_addresses).and_return(
+      allow(SiteConfig).to receive(:email_addresses).and_return(
         {
           default: "hi@dev.to",
           contact: contact_email,
@@ -219,7 +218,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
-  describe "#cloudinary", cloudinary: true do
+  describe "#cloudinary" do
     it "returns cloudinary-manipulated link" do
       image = helper.optimized_image_url(Faker::Placeholdit.image)
       expect(image).to start_with("https://res.cloudinary.com")
@@ -241,7 +240,7 @@ RSpec.describe ApplicationHelper, type: :helper do
   end
 
   describe "#optimized_image_tag" do
-    it "works just like cl_image_tag", cloudinary: true do
+    it "works just like cl_image_tag" do
       image_url = "https://i.imgur.com/fKYKgo4.png"
       cloudinary_image_tag = cl_image_tag(image_url,
                                           type: "fetch", crop: "imagga_scale",

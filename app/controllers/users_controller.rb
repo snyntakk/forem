@@ -13,8 +13,6 @@ class UsersController < ApplicationController
   ALLOWED_USER_PARAMS = %i[last_onboarding_page username].freeze
   INDEX_ATTRIBUTES_FOR_SERIALIZATION = %i[id name username summary profile_image].freeze
   private_constant :INDEX_ATTRIBUTES_FOR_SERIALIZATION
-  REMOVE_IDENTITY_ERROR = "An error occurred. Please try again or send an email to: %<email>s".freeze
-  private_constant :REMOVE_IDENTITY_ERROR
 
   def index
     @users =
@@ -22,7 +20,7 @@ class UsersController < ApplicationController
       when "follow_suggestions"
         determine_follow_suggestions(current_user)
       when "sidebar_suggestions"
-        Users::SuggestForSidebar.call(current_user, params[:tag]).sample(3)
+        Suggester::Users::Sidebar.new(current_user, params[:tag]).suggest.sample(3)
       else
         User.none
       end
@@ -134,7 +132,7 @@ class UsersController < ApplicationController
   def remove_identity
     set_current_tab("account")
 
-    error_message = format(REMOVE_IDENTITY_ERROR, email: Settings::General.email_addresses[:contact])
+    error_message = "An error occurred. Please try again or send an email to: #{SiteConfig.email_addresses[:contact]}"
     unless Authentication::Providers.enabled?(params[:provider])
       flash[:error] = error_message
       redirect_to user_settings_path(@tab)
@@ -298,7 +296,7 @@ class UsersController < ApplicationController
   end
 
   def set_suggested_users
-    @suggested_users = Settings::General.suggested_users
+    @suggested_users = SiteConfig.suggested_users
   end
 
   def default_suggested_users
@@ -306,12 +304,12 @@ class UsersController < ApplicationController
   end
 
   def determine_follow_suggestions(current_user)
-    return default_suggested_users if Settings::General.prefer_manual_suggested_users? && default_suggested_users
+    return default_suggested_users if SiteConfig.prefer_manual_suggested_users? && default_suggested_users
 
-    recent_suggestions = Users::SuggestRecent.call(
+    recent_suggestions = Suggester::Users::Recent.new(
       current_user,
       attributes_to_select: INDEX_ATTRIBUTES_FOR_SERIALIZATION,
-    )
+    ).suggest
 
     recent_suggestions.presence || default_suggested_users
   end

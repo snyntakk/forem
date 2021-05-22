@@ -16,9 +16,9 @@ describe('Mascot Section', () => {
 
         cy.get('@mascotSectionForm').findByText('Mascot').click();
         cy.get('@mascotSectionForm')
-          .findByLabelText('Mascot Image URL')
+          .get('#settings_mascot_image_url')
           .clear()
-          .type('notanimage');
+          .type('example.com/image.png');
 
         cy.get('@mascotSectionForm')
           .findByPlaceholderText('Confirmation text')
@@ -26,12 +26,14 @@ describe('Mascot Section', () => {
             `My username is @${username} and this action is 100% safe and appropriate.`,
           );
 
-        cy.get('@mascotSectionForm').findByText('Update Settings').click();
+        cy.get('@mascotSectionForm')
+          .findByText('Update Site Configuration')
+          .click();
 
         cy.url().should('contains', '/admin/customization/config');
 
         cy.findByText(
-          '😭 Validation failed: Mascot image url is not a valid URL',
+          '😭 Validation failed: Image url is not a valid URL',
         ).should('be.visible');
       });
     });
@@ -43,7 +45,7 @@ describe('Mascot Section', () => {
 
         cy.get('@mascotSectionForm').findByText('Mascot').click();
         cy.get('@mascotSectionForm')
-          .findByLabelText('Mascot Image URL')
+          .get('#settings_mascot_image_url')
           .clear()
           .type('https://example.com/image.png');
 
@@ -53,15 +55,19 @@ describe('Mascot Section', () => {
             `My username is @${username} and this action is 100% safe and appropriate.`,
           );
 
-        cy.get('@mascotSectionForm').findByText('Update Settings').click();
+        cy.get('@mascotSectionForm')
+          .findByText('Update Site Configuration')
+          .click();
 
         cy.url().should('contains', '/admin/customization/config');
 
-        cy.findByText('Successfully updated settings.').should('be.visible');
+        cy.findByText('Site configuration was successfully updated.').should(
+          'be.visible',
+        );
 
         // Page reloaded so need to get a new reference to the form.
-        cy.findByTestId('mascotSectionForm').as('mascotSectionForm');
-        cy.findByLabelText('Mascot Image URL').should(
+        cy.get('#new_settings_mascot').as('mascotSectionForm');
+        cy.get('#settings_mascot_image_url').should(
           'have.value',
           'https://example.com/image.png',
         );

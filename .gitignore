@@ -100,4 +100,3 @@ postcss_error.log
 
 # ripgrep ignore file
 .rgignore
-config/definitions.rb
